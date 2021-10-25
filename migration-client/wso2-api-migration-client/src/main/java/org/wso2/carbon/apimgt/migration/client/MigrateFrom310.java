@@ -81,6 +81,7 @@ public class MigrateFrom310 extends MigrationClientBase implements MigrationClie
     public void registryResourceMigration() throws APIMigrationException {
         rxtMigration(registryService);
         updateEnableStoreInRxt();
+        updateAPIPropertyVisibility();
     }
 
     @Override
@@ -234,6 +235,37 @@ public class MigrateFrom310 extends MigrationClientBase implements MigrationClie
             }
         }
     }
+
+    private void updateAPIPropertyVisibility() {
+        for (Tenant tenant : getTenantsArray()) {
+            try {
+                registryService.startTenantFlow(tenant);
+                log.debug("Updating API properties for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')');
+                GenericArtifact[] artifacts = registryService.getGenericAPIArtifacts();
+                for (GenericArtifact artifact : artifacts) {
+                    String path = artifact.getPath();
+                    if (registryService.isGovernanceRegistryResourceExists(path)) {
+                        Object apiResource = registryService.getGovernanceRegistryResource(path);
+                        if (apiResource == null) {
+                            continue;
+                        }
+                        registryService.updateAPIPropertyVisibility(path);
+                    }
+                }
+                log.info("Completed Updating API properties for tenant ---- "
+                        + tenant.getId() + '(' + tenant.getDomain() + ')');
+            } catch (GovernanceException e) {
+                log.error("Error while accessing API artifact in registry for tenant " + tenant.getId() + '(' +
+                        tenant.getDomain() + ')', e);
+            } catch (RegistryException | UserStoreException e) {
+                log.error("Error while updating API artifact in the registry for tenant " + tenant.getId() + '(' +
+                        tenant.getDomain() + ')', e);
+            } finally {
+                registryService.endTenantFlow();
+            }
+        }
+    }
+
 
     @Override
     public void checkCrossTenantAPISubscriptions(TenantManager tenantManager, boolean ignoreCrossTenantSubscriptions)

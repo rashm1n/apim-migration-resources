@@ -147,6 +147,7 @@ public class APIMMigrationService implements ServerStartupObserver {
                 MigrationClient migrateFrom310 = new MigrateFrom310(tenants, blackListTenants,
                         tenantRange, registryService, tenantManager);
                 migrateFrom310.checkCrossTenantAPISubscriptions(tenantManager, ignoreCrossTenantSubscriptions);
+                migrateFrom310.registryResourceMigration();
                 migrateFrom310.scopeMigration();
                 migrateFrom310.spMigration();
                 log.info("Migrated Successfully to 3.2");
