@@ -1241,4 +1241,9 @@ public class MigrateFrom110to200 extends MigrationClientBase implements Migratio
     public void checkCrossTenantAPISubscriptions(TenantManager tenantManager, boolean ignoreCrossTenantSubscriptions)
             throws APIMigrationException {
     }
+
+    @Override
+    public void updateAPIPropertyVisibility() {
+
+    }
 }

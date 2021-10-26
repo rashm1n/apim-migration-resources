@@ -52,6 +52,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
+import java.util.Properties;
 
 
 public class RegistryServiceImpl implements RegistryService {
@@ -479,6 +480,40 @@ public class RegistryServiceImpl implements RegistryService {
             log.error("Error occurred when updating API Artifact in registry", e);
         } catch (APIManagementException e) {
             log.error("Error occurred when getting artifact manager", e);
+        }
+    }
+
+    /**
+     * This method updates the API properties so that they will be visible in the store by default
+     * @param resourcePath
+     */
+    @Override
+    public void updateAPIPropertyVisibility(String resourcePath) {
+        try {
+            Registry registry = getGovernanceRegistry();
+            Resource resource = registry.get(resourcePath);
+            boolean isResourceUpdated = false;
+            if (log.isDebugEnabled()) {
+                log.debug("Updating properties for registry path: " + resourcePath);
+            }
+            Properties map = resource.getProperties();
+            for (Object entry : map.keySet()) {
+                String key = entry.toString();
+                if (key.startsWith("api_meta.") && !key.endsWith("__display")) {
+                    String newKey = key + "__display";
+                    if (log.isDebugEnabled()) {
+                        log.debug("Replacing property: " + key + " with property: " + newKey);
+                    }
+                    resource.addProperty(newKey, resource.getProperty(key));
+                    resource.removeProperty(key);
+                    isResourceUpdated = true;
+                }
+            }
+            if (isResourceUpdated) {
+                registry.put(resourcePath, resource);
+            }
+        } catch (UserStoreException | RegistryException e) {
+            log.error("Error occurred when updating API Artifact in registry", e);
         }
     }
 }

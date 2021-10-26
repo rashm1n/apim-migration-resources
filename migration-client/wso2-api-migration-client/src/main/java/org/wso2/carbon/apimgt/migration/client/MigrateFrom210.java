@@ -117,4 +117,9 @@ public class MigrateFrom210 extends MigrationClientBase implements MigrationClie
     public void checkCrossTenantAPISubscriptions(TenantManager tenantManager, boolean ignoreCrossTenantSubscriptions)
             throws APIMigrationException {
     }
+
+    @Override
+    public void updateAPIPropertyVisibility() {
+
+    }
 }

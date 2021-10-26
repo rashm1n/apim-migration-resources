@@ -190,6 +190,11 @@ public class MigrateFrom200to210 extends MigrationClientBase implements Migratio
             throws APIMigrationException {
     }
 
+    @Override
+    public void updateAPIPropertyVisibility() {
+
+    }
+
     private static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
     }

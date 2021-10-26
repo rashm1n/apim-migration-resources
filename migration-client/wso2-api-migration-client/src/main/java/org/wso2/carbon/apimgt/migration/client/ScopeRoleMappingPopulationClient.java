@@ -430,4 +430,9 @@ public class ScopeRoleMappingPopulationClient extends MigrationClientBase implem
     public void checkCrossTenantAPISubscriptions(TenantManager tenantManager, boolean ignoreCrossTenantSubscriptions)
             throws APIMigrationException {
     }
+
+    @Override
+    public void updateAPIPropertyVisibility() {
+
+    }
 }
