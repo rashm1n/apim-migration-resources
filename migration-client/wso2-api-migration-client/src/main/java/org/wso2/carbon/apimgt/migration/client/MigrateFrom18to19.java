@@ -1522,4 +1522,9 @@ public class MigrateFrom18to19 extends MigrationClientBase implements MigrationC
     public void checkCrossTenantAPISubscriptions(TenantManager tenantManager, boolean ignoreCrossTenantSubscriptions)
             throws APIMigrationException {
     }
+
+    @Override
+    public void updateAPIPropertyVisibility() {
+
+    }
 }

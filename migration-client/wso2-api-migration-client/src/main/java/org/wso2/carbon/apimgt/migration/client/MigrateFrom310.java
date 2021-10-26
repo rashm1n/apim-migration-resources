@@ -81,7 +81,6 @@ public class MigrateFrom310 extends MigrationClientBase implements MigrationClie
     public void registryResourceMigration() throws APIMigrationException {
         rxtMigration(registryService);
         updateEnableStoreInRxt();
-        updateAPIPropertyVisibility();
     }
 
     @Override
@@ -236,7 +235,8 @@ public class MigrateFrom310 extends MigrationClientBase implements MigrationClie
         }
     }
 
-    private void updateAPIPropertyVisibility() {
+    @Override
+    public void updateAPIPropertyVisibility() {
         for (Tenant tenant : getTenantsArray()) {
             try {
                 registryService.startTenantFlow(tenant);

@@ -199,4 +199,9 @@ public class APIMStatMigrationClient extends MigrationClientBase implements Migr
     public void checkCrossTenantAPISubscriptions(TenantManager tenantManager, boolean ignoreCrossTenantSubscriptions)
             throws APIMigrationException {
     }
+
+    @Override
+    public void updateAPIPropertyVisibility() {
+
+    }
 }
