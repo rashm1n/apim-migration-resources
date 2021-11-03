@@ -52,6 +52,8 @@ import org.wso2.carbon.user.api.UserStoreException;
 import javax.xml.stream.XMLStreamException;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -497,19 +499,23 @@ public class RegistryServiceImpl implements RegistryService {
                 log.debug("Updating properties for registry path: " + resourcePath);
             }
             Properties map = resource.getProperties();
+            List<String> modifiableKeys= new ArrayList<>();
             for (Object entry : map.keySet()) {
                 String key = entry.toString();
                 if (key.startsWith("api_meta.") && !key.endsWith("__display")) {
-                    String newKey = key + "__display";
-                    if (log.isDebugEnabled()) {
-                        log.debug("Replacing property: " + key + " with property: " + newKey);
-                    }
-                    resource.addProperty(newKey, resource.getProperty(key));
-                    resource.removeProperty(key);
+                    modifiableKeys.add(key);
                     isResourceUpdated = true;
                 }
             }
             if (isResourceUpdated) {
+                for (String modifiableKey : modifiableKeys) {
+                    String newKey = modifiableKey + "__display";
+                    if (log.isDebugEnabled()) {
+                        log.debug("Replacing property: " + modifiableKey + " with property: " + newKey);
+                    }
+                    resource.addProperty(newKey, resource.getProperty(modifiableKey));
+                    resource.removeProperty(modifiableKey);
+                }
                 registry.put(resourcePath, resource);
             }
         } catch (UserStoreException | RegistryException e) {
