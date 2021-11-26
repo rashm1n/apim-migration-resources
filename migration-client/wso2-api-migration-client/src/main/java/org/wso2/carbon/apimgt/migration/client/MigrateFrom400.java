@@ -49,6 +49,7 @@ public class MigrateFrom400 extends MigrationClientBase implements MigrationClie
         populateApiCategoryOrganizations();
         populateApiOrganizations();
         populateApplicationOrganizations();
+        populateApiDefaultVersionOrganizations();
     }
 
     private void populateApiCategoryOrganizations() throws APIMigrationException {
@@ -76,6 +77,11 @@ public class MigrateFrom400 extends MigrationClientBase implements MigrationClie
             subscriberOrganizations.put(subscriberIdAndTenantId.getKey(), organization);
         }
         apiMgtDAO.updateApplicationOrganizations(subscriberOrganizations);
+    }
+
+    private void populateApiDefaultVersionOrganizations() throws APIMigrationException {
+        ArrayList<APIInfoDTO> apiData = apiMgtDAO.getAPIData();
+        apiMgtDAO.updateApiDefaultVersionOrganizations(apiData);
     }
 
     @Override

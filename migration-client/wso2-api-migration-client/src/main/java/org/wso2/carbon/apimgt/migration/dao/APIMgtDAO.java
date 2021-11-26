@@ -72,6 +72,7 @@ public class APIMgtDAO {
     private static final String API_NAME = "API_NAME";
     private static final String API_VERSION = "API_VERSION";
     private static final String API_PROVIDER = "API_PROVIDER";
+    private static final String ORGANIZATION = "ORGANIZATION"
     private static final String CONTEXT = "CONTEXT";
     private static final String CONTEXT_TEMPLATE = "CONTEXT_TEMPLATE";
     private static final String SCOPE_ID = "SCOPE_ID";
@@ -211,6 +212,12 @@ public class APIMgtDAO {
                     "SET AM_APPLICATION.ORGANIZATION = ? " +
                     "WHERE AM_APPLICATION.SUBSCRIBER_ID = ?";
 
+    private static String UPDATE_API_DEFAULT_VERSION_ORGANIZATION =
+            "UPDATE AM_API_DEFAULT_VERSION " +
+                    "SET AM_API_DEFAULT_VERSION.ORGANIZATION = ? " +
+                    "WHERE AM_API_DEFAULT_VERSION.API_NAME = ? " +
+                    "AND AM_API_DEFAULT_VERSION.API_PROVIDER = ?";
+
     private APIMgtDAO() {
 
     }
@@ -270,6 +277,7 @@ public class APIMgtDAO {
                         apiInfoDTO.setApiVersion(resultSet.getString(API_VERSION));
                         apiInfoDTO.setApiContext(resultSet.getString(CONTEXT));
                         apiInfoDTO.setGetApiContextTemplate(resultSet.getString(CONTEXT_TEMPLATE));
+                        apiInfoDTO.setOrganization(resultSet.getString(ORGANIZATION))
                         apiInfoList.add(apiInfoDTO);
                     }
                     return apiInfoList;
@@ -1228,6 +1236,33 @@ public class APIMgtDAO {
             }
         } catch (SQLException e) {
             throw new APIMigrationException("Error while updating organizations for applications in the database " + e);
+        }
+    }
+
+    /**
+     * Sets organizations in the AM_API_DEFAULT_VERSION table
+     *
+     * @param apis APInfo DTOs of the APIs in the database
+     * @throws APIMigrationException
+     */
+    public void updateApiDefaultVersionOrganizations(ArrayList<APIInfoDTO> apis)
+            throws APIMigrationException {
+        try (Connection conn = APIMgtDBUtil.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(UPDATE_API_DEFAULT_VERSION_ORGANIZATION)) {
+                for (APIInfoDTO apiInfoDTO : apis) {
+                    ps.setString(1, apiInfoDTO.getOrganization());
+                    ps.setString(2, apiInfoDTO.getApiName());
+                    ps.setString(3, apiInfoDTO.getApiProvider());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+            }
+        } catch (SQLException e) {
+            throw new APIMigrationException("Error while updating organizations for application default versions in the database " + e);
         }
     }
 }
